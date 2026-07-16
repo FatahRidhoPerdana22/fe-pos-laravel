@@ -1,18 +1,18 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import PrimeVue from 'primevue/config'
-import { definePreset } from '@primeuix/themes'
-import Aura from '@primeuix/themes/aura'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import PrimeVue from 'primevue/config';
+import { definePreset } from '@primeuix/themes';
+import Aura from '@primeuix/themes/aura';
 
-import './assets/main.css'
+import './assets/main.css';
 
-import App from './App.vue'
-import router from './router'
+import App from './App.vue';
+import router from './router';
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(createPinia())
-app.use(router)
+app.use(createPinia());
+app.use(router);
 
 const FlashPreset = definePreset(Aura, {
     semantic: {
@@ -27,7 +27,7 @@ const FlashPreset = definePreset(Aura, {
             700: '{emerald.700}',
             800: '{emerald.800}',
             900: '{emerald.900}',
-            950: '{emerald.950}'
+            950: '{emerald.950}',
         },
         colorScheme: {
             light: {
@@ -43,18 +43,20 @@ const FlashPreset = definePreset(Aura, {
                     700: '{zinc.700}',
                     800: '{zinc.800}',
                     900: '{zinc.900}',
-                    950: '{zinc.950}'
-                }
-            }
-        }
-    }
+                    950: '{zinc.950}',
+                },
+            },
+        },
+    },
 });
 
 app.use(PrimeVue, {
     theme: {
-        preset: FlashPreset
-    }
-})
+        preset: FlashPreset,
+        options: {
+            darkModeSelector: '.app-dark',
+        },
+    },
+});
 
-
-app.mount('#app')
+app.mount('#app');

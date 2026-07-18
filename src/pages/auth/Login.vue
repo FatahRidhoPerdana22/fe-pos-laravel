@@ -7,6 +7,8 @@ import Message from 'primevue/message';
 
 const auth = useAuthStore();
 const error = ref<string | null>(null);
+const loading = ref(false);
+
 const form = ref({
     email: '',
     password: '',
@@ -20,11 +22,15 @@ async function login() {
         return;
     }
 
+    loading.value = true;
+
     try {
         await auth.login(form.value.email, form.value.password);
         router.push({ name: 'dashboard' });
     } catch (err) {
         error.value = 'Login failed. Please check your credentials.';
+    } finally {
+        loading.value = false;
     }
 }
 </script>
@@ -85,6 +91,9 @@ async function login() {
                         />
                     </div>
                     <Button
+                        :loading="loading"
+                        :disabled="loading"
+                        loadingIcon="pi pi-spinner pi-spin text-lg"
                         type="submit"
                         label="Sign In"
                         class="bg-primary-600 hover:bg-primary-700 rounded-lg py-2 text-white transition-colors duration-200"

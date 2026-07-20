@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
+import { RouterLink } from 'vue-router';
 import {
     Button,
     DataTable,
@@ -90,9 +91,11 @@ onMounted(() => {
                 <h1 class="text-surface-900 mb-1 text-2xl font-bold">Product Categories</h1>
                 <p class="text-surface-500 text-sm">The list here shows all product categories</p>
             </div>
-            <!--RouterLink :to>
-                <Button label="Add Category" icon="pi pi-plus" size="small" />
-            </!--RouterLink-->
+            <Button asChild v-slot="slotProps" raised>
+                <RouterLink :to="{ name: 'product-categories-create' }" :class="slotProps.class">
+                    <i class="pi pi-plus" /> Add New Category
+                </RouterLink>
+            </Button>
         </div>
 
         <!-- Table -->
@@ -135,7 +138,11 @@ onMounted(() => {
                 <Column header="Actions">
                     <template #body="{ data }">
                         <div class="flex gap-2">
-                            <Button icon="pi pi-pencil" severity="warn" size="small" />
+                            <RouterLink
+                                :to="{ name: 'product-categories-edit', params: { id: data.id } }"
+                            >
+                                <Button icon="pi pi-pencil" severity="warn" size="small" />
+                            </RouterLink>
                             <Button
                                 icon="pi pi-trash"
                                 severity="danger"

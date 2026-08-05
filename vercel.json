@@ -1,8 +1,8 @@
 {
-    "rewrites": [
-        {
-            "source": "/api/:path*",
-            "destination": "http://kasir-pos.free.je/api/:path*"
-        }
-    ]
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://kasir-pos.whf.bz/api/:path*"
+    }
+  ]
 }

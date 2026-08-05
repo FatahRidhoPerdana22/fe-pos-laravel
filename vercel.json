@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://kasir-pos.free.je/api/:path*"
+            "destination": "http://kasir-pos.free.je/api/:path*"
         }
     ]
 }

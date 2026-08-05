@@ -1,7 +1,10 @@
 import api from './axios';
 
-export const getCategories = (params?: { page?: number; search?: string; limit?: number }) => {
-    return api.get('/product-categories', { params });
+export const getCategories = (
+    params?: { page?: number; search?: string; limit?: number },
+    options?: { skipGlobalLoading?: boolean },
+) => {
+    return api.get('/product-categories', { params, ...options });
 };
 
 export const getCategory = (id: number) => api.get(`/product-categories/${id}`);
@@ -15,5 +18,8 @@ export const uploadCategoryImage = (id: number, formData: FormData) =>
             'Content-Type': 'multipart/form-data',
         },
     });
+
+export const updateCategory = (id: number, payload: { name: string; description?: string }) =>
+    api.put(`/product-categories/${id}`, payload);
 
 export const deleteCategories = (id: number) => api.delete(`/product-categories/${id}`);

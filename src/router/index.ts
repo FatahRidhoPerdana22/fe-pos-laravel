@@ -26,6 +26,11 @@ const router = createRouter({
                     component: Dashboard,
                 },
                 {
+                    path: '/pos',
+                    name: 'pos',
+                    component: () => import('@/pages/pos/PosCashier.vue'),
+                },
+                {
                     path: '/product-categories',
                     name: 'product-categories',
                     component: CategoryList,
@@ -39,6 +44,46 @@ const router = createRouter({
                     path: '/product-categories/:id/edit',
                     name: 'product-categories-edit',
                     component: CategoryForm,
+                },
+                {
+                    path: '/products',
+                    name: 'products',
+                    component: () => import('@/pages/products/ProductList.vue'),
+                },
+                {
+                    path: '/products/create',
+                    name: 'products-create',
+                    component: () => import('@/pages/products/ProductForm.vue'),
+                },
+                {
+                    path: '/products/:id/edit',
+                    name: 'products-edit',
+                    component: () => import('@/pages/products/ProductForm.vue'),
+                },
+                {
+                    path: '/customers',
+                    name: 'customers',
+                    component: () => import('@/pages/customers/CustomerList.vue'),
+                },
+                {
+                    path: '/customers/create',
+                    name: 'customers-create',
+                    component: () => import('@/pages/customers/CustomerForm.vue'),
+                },
+                {
+                    path: '/customers/:id/edit',
+                    name: 'customers-edit',
+                    component: () => import('@/pages/customers/CustomerForm.vue'),
+                },
+                {
+                    path: '/transactions',
+                    name: 'transactions',
+                    component: () => import('@/pages/transactions/TransactionList.vue'),
+                },
+                {
+                    path: '/transactions/:id',
+                    name: 'transactions-detail',
+                    component: () => import('@/pages/transactions/TransactionDetail.vue'),
                 },
             ],
         },

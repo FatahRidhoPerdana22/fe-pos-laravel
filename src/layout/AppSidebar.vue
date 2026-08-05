@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
@@ -20,11 +20,19 @@ const route = useRoute();
 const menuItems = ref([
     {
         label: 'General',
-        items: [{ icon: 'pi pi-th-large', to: '/', label: 'Dashboard' }],
+        items: [
+            { icon: 'pi pi-th-large', to: '/', label: 'Dashboard' },
+            { icon: 'pi pi-shopping-cart', to: '/pos', label: 'Cashier / POS' },
+            { icon: 'pi pi-history', to: '/transactions', label: 'Transactions' },
+        ],
     },
     {
         label: 'Management',
-        items: [{ icon: 'pi pi-tag', to: '/product-categories', label: 'Product Categories' }],
+        items: [
+            { icon: 'pi pi-tag', to: '/product-categories', label: 'Product Categories' },
+            { icon: 'pi pi-box', to: '/products', label: 'Products' },
+            { icon: 'pi pi-users', to: '/customers', label: 'Customers' },
+        ],
     },
 ]);
 </script>

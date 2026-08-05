@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { createCategory, getCategory, uploadCategoryImage } from '@/api/product-categories.api';
+import {
+    createCategory,
+    getCategory,
+    updateCategory,
+    uploadCategoryImage,
+} from '@/api/product-categories.api';
 import router from '@/router';
 import { Button, FileUpload, InputText, Message, useToast, Textarea } from 'primevue';
 import { computed, onMounted, ref } from 'vue';
@@ -39,9 +44,12 @@ const submit = async () => {
     loading.value = true;
 
     try {
-        const res = await createCategory(form.value);
-
-        form.value.id = res.data.data.id;
+        if (isEdit.value) {
+            await updateCategory(form.value.id, form.value);
+        } else {
+            const res = await createCategory(form.value);
+            form.value.id = res.data.data.id;
+        }
 
         if (selectedFile.value) {
             const fd = new FormData();
@@ -53,7 +61,9 @@ const submit = async () => {
         toast.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Category created successfully',
+            detail: isEdit.value
+                ? 'Category Updated successfully'
+                : 'Category created successfully',
             life: 3000,
         });
 
@@ -85,6 +95,7 @@ onMounted(async () => {
         const res = await getCategory(categoryId.value!);
         const data = res.data.data;
 
+        form.value.id = data.id;
         form.value.name = data.name;
         form.value.description = data.description ?? '';
         imagePreview.value = data.image ?? '';

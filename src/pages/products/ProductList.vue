@@ -11,20 +11,19 @@ import {
     useConfirm,
     ConfirmDialog,
 } from 'primevue';
-/*import { RouterLink } from 'vue-router';*/
-import { useProductCategoryStore } from '@/stores/product-category.store';
+import { useProductStore } from '@/stores/product.store';
 import { storeToRefs } from 'pinia';
 import { useDebounceFn } from '@vueuse/core';
-import { deleteCategories } from '@/api/product-categories.api';
-import { detail, summary } from '@primeuix/themes/aura/toast';
+import { deleteProduct } from '@/api/products.api';
+import { getCategories } from '@/api/product-categories.api';
 import { useToast } from 'primevue/usetoast';
 
 /* GET & Pagination */
-const productCategoryStore = useProductCategoryStore();
-const { fetch, setLimit, setPage, setSearch, nextPage, prevPage } = productCategoryStore;
+const productStore = useProductStore();
+const { fetch, setLimit, setPage, setSearch, nextPage, prevPage, setCategoryFilter } = productStore;
 
-const { items, loading, limit, currentPage, totalPages, search } =
-    storeToRefs(productCategoryStore);
+const { items, loading, limit, currentPage, totalPages, search, categoryFilter } =
+    storeToRefs(productStore);
 /* GET & Pagination */
 
 /* Live Search */
@@ -43,7 +42,7 @@ const confirm = useConfirm();
 
 const confirmDelete = (id: number) => {
     confirm.require({
-        message: 'Are u sure want to delete this category ',
+        message: 'Are you sure you want to delete this product?',
         header: 'Confirm Delete',
         icon: 'pi pi-exclamation-triangle',
         rejectProps: {
@@ -57,19 +56,19 @@ const confirmDelete = (id: number) => {
         },
         accept: async () => {
             try {
-                await deleteCategories(id);
+                await deleteProduct(id);
                 toast.add({
                     severity: 'success',
                     summary: 'Deleted',
-                    detail: 'Category Removed',
+                    detail: 'Product Removed',
                     life: 3000,
                 });
                 fetch();
             } catch (error) {
                 toast.add({
                     severity: 'error',
-                    summary: 'error',
-                    detail: 'Failed to Remove Category',
+                    summary: 'Error',
+                    detail: 'Failed to Remove Product',
                     life: 3000,
                 });
             }
@@ -79,7 +78,37 @@ const confirmDelete = (id: number) => {
 
 /* Confirm & Notification Delete */
 
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+    }).format(value);
+};
+
+/* Category Filter */
+const categoryOptions = ref<{ label: string; value: number }[]>([]);
+
+const fetchCategories = async () => {
+    try {
+        const res = await getCategories({ limit: 100 });
+        const items = res.data.data.items;
+        categoryOptions.value = items.map((item: any) => ({
+            label: item.name,
+            value: item.id,
+        }));
+    } catch (err) {
+        console.error('Failed to load categories:', err);
+    }
+};
+
+const onCategoryChange = (value: number | null) => {
+    setCategoryFilter(value ? Number(value) : null);
+};
+/* Category Filter */
+
 onMounted(() => {
+    fetchCategories();
     fetch();
 });
 </script>
@@ -88,12 +117,12 @@ onMounted(() => {
     <div class="bg-surface-50 text-surface-900 min-h-screen font-sans">
         <div class="mb-8 flex items-center justify-between">
             <div class="">
-                <h1 class="text-surface-900 mb-1 text-2xl font-bold">Product Categories</h1>
-                <p class="text-surface-500 text-sm">The list here shows all product categories</p>
+                <h1 class="text-surface-900 mb-1 text-2xl font-bold">Products</h1>
+                <p class="text-surface-500 text-sm">The list here shows all products</p>
             </div>
             <Button asChild v-slot="slotProps" raised>
-                <RouterLink :to="{ name: 'product-categories-create' }" :class="slotProps.class">
-                    <i class="pi pi-plus" /> Add New Category
+                <RouterLink :to="{ name: 'products-create' }" :class="slotProps.class">
+                    <i class="pi pi-plus" /> Add New Product
                 </RouterLink>
             </Button>
         </div>
@@ -109,6 +138,19 @@ onMounted(() => {
                     </div>
                     <InputText v-model="search" placeholder="Search..." class="w-full pl-10!" />
                 </IconField>
+                <Select
+                    :model-value="categoryFilter"
+                    :options="categoryOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="All Categories"
+                    :showClear="true"
+                    filter
+                    filterPlaceholder="Search category..."
+                    resetFilterOnHide
+                    @update:model-value="onCategoryChange"
+                    class="w-full md:w-56"
+                />
             </div>
             <DataTable
                 :value="items"
@@ -128,19 +170,29 @@ onMounted(() => {
                     </template>
                 </Column>
                 <Column field="name" header="Name" class="text-surface-900 font-medium" sortable />
-                <Column field="description" header="Description" class="w-96" sortable>
+                <Column field="category.name" header="Category" sortable>
                     <template #body="{ data }">
                         <span class="text-surface-900 text-xs font-normal">{{
-                            data.description
+                            data.category?.name ?? '-'
                         }}</span>
+                    </template>
+                </Column>
+                <Column field="price" header="Price" sortable>
+                    <template #body="{ data }">
+                        <span class="text-surface-900 text-sm font-medium">{{
+                            formatCurrency(data.price)
+                        }}</span>
+                    </template>
+                </Column>
+                <Column field="stock" header="Stock" sortable>
+                    <template #body="{ data }">
+                        <span class="text-surface-900 text-sm font-medium">{{ data.stock }}</span>
                     </template>
                 </Column>
                 <Column header="Actions">
                     <template #body="{ data }">
                         <div class="flex gap-2">
-                            <RouterLink
-                                :to="{ name: 'product-categories-edit', params: { id: data.id } }"
-                            >
+                            <RouterLink :to="{ name: 'products-edit', params: { id: data.id } }">
                                 <Button icon="pi pi-pencil" severity="warn" size="small" />
                             </RouterLink>
                             <Button

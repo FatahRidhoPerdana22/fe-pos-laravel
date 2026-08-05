@@ -1,10 +1,10 @@
-import { getCategories } from '@/api/product-categories.api';
-import type { ProductCategory } from '@/types/product-category';
+import { getTransactions } from '@/api/transactions.api';
+import type { Transaction } from '@/types/transaction';
 import { defineStore } from 'pinia';
 
-export const useProductCategoryStore = defineStore('productCategory', {
+export const useTransactionStore = defineStore('transaction', {
     state: () => ({
-        items: [] as ProductCategory[],
+        items: [] as Transaction[],
         pagination: {
             current_page: 1,
             last_page: 1,
@@ -28,14 +28,11 @@ export const useProductCategoryStore = defineStore('productCategory', {
         async fetch() {
             this.loading = true;
             try {
-                const res = await getCategories(
-                    {
-                        page: this.page,
-                        search: this.search,
-                        limit: this.limit,
-                    },
-                    { skipGlobalLoading: true },
-                );
+                const res = await getTransactions({
+                    page: this.page,
+                    search: this.search,
+                    limit: this.limit,
+                });
 
                 const rawItems = res.data.data.items;
 
@@ -46,7 +43,7 @@ export const useProductCategoryStore = defineStore('productCategory', {
 
                 this.pagination = res.data.data.pagination;
             } catch (error) {
-                console.error('Error fetching product categories:', error);
+                console.error('Error fetching transactions:', error);
             } finally {
                 this.loading = false;
             }

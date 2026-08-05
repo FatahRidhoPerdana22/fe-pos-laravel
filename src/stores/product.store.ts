@@ -1,10 +1,10 @@
-import { getCategories } from '@/api/product-categories.api';
-import type { ProductCategory } from '@/types/product-category';
+import { getProducts } from '@/api/products.api';
+import type { Product } from '@/types/product';
 import { defineStore } from 'pinia';
 
-export const useProductCategoryStore = defineStore('productCategory', {
+export const useProductStore = defineStore('product', {
     state: () => ({
-        items: [] as ProductCategory[],
+        items: [] as Product[],
         pagination: {
             current_page: 1,
             last_page: 1,
@@ -16,6 +16,7 @@ export const useProductCategoryStore = defineStore('productCategory', {
         page: 1,
         search: '',
         limit: 10,
+        categoryFilter: null as number | null,
         loading: false,
     }),
 
@@ -28,16 +29,26 @@ export const useProductCategoryStore = defineStore('productCategory', {
         async fetch() {
             this.loading = true;
             try {
-                const res = await getCategories(
+                const res = await getProducts(
                     {
                         page: this.page,
                         search: this.search,
                         limit: this.limit,
+                        product_category_id: this.categoryFilter,
                     },
                     { skipGlobalLoading: true },
                 );
 
-                const rawItems = res.data.data.items;
+                let rawItems = res.data.data.items || [];
+
+                if (this.categoryFilter) {
+                    rawItems = rawItems.filter(
+                        (item: any) =>
+                            Number(item.product_category_id) === Number(this.categoryFilter) ||
+                            (item.category &&
+                                Number(item.category.id) === Number(this.categoryFilter)),
+                    );
+                }
 
                 this.items = rawItems.map((item: any, index: number) => ({
                     ...item,
@@ -46,7 +57,7 @@ export const useProductCategoryStore = defineStore('productCategory', {
 
                 this.pagination = res.data.data.pagination;
             } catch (error) {
-                console.error('Error fetching product categories:', error);
+                console.error('Error fetching products:', error);
             } finally {
                 this.loading = false;
             }
@@ -65,6 +76,12 @@ export const useProductCategoryStore = defineStore('productCategory', {
 
         setLimit(limit: number) {
             this.limit = limit;
+            this.page = 1;
+            this.fetch();
+        },
+
+        setCategoryFilter(categoryId: number | null) {
+            this.categoryFilter = categoryId ? Number(categoryId) : null;
             this.page = 1;
             this.fetch();
         },
